@@ -35,6 +35,9 @@ def main():
             compra = float(input("Precio compra: "))
             venta = float(input("Precio venta: "))
             stock = int(input("Stock: "))
+            if compra < 0 or venta < 0 or stock < 0:
+                print("Precio compra, precio venta y stock no pueden ser negativos.")
+                continue
             categoria = input("Categoria: ") or "General"
             p = inventario.registrar_producto(nombre, compra, venta, stock, categoria)
             print(f"Producto registrado con ID {p.id}")
