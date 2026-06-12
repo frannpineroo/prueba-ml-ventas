@@ -1,37 +1,27 @@
 {
   "1": {
-    "producto": "Laptop Pro 15",
-    "mae": 0.93,
-    "rmse": 1.11,
-    "r2": 0.9,
-    "ultimo_mes": 12
-  },
-  "2": {
-    "producto": "Mouse Inalámbrico",
-    "mae": 0.78,
-    "rmse": 1.16,
-    "r2": 0.98,
-    "ultimo_mes": 12
-  },
-  "3": {
-    "producto": "Teclado Mecánico",
-    "mae": 0.51,
-    "rmse": 0.64,
-    "r2": 0.98,
-    "ultimo_mes": 12
-  },
-  "4": {
-    "producto": "Monitor 27\"",
-    "mae": 0.43,
-    "rmse": 0.58,
-    "r2": 0.95,
-    "ultimo_mes": 12
-  },
-  "5": {
-    "producto": "Silla Ergonómica",
-    "mae": 0.49,
-    "rmse": 0.63,
-    "r2": 0.95,
+    "producto": "Laptop",
+    "modelo_elegido": "Regresion Lineal",
+    "mae": 0.0,
+    "rmse": 0.0,
+    "r2": 1.0,
+    "comparacion": {
+      "Regresion Lineal": {
+        "mae": 0.0,
+        "rmse": 0.0,
+        "r2": 1.0
+      },
+      "Arbol de Decision": {
+        "mae": 0.0,
+        "rmse": 0.0,
+        "r2": 1.0
+      },
+      "Random Forest": {
+        "mae": 0.2,
+        "rmse": 0.26,
+        "r2": 0.99
+      }
+    },
     "ultimo_mes": 12
   }
 }

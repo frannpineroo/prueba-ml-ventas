@@ -3,11 +3,21 @@ from pathlib import Path
 
 import joblib
 import numpy as np
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeRegressor
 
 from servicios.analizador_datos import AnalizadorDatos
 from servicios.gestion_inventario import GestionInventario
+
+MODELOS = {
+    "Regresion Lineal": LinearRegression(),
+    "Arbol de Decision": DecisionTreeRegressor(random_state=42),
+    "Random Forest": RandomForestRegressor(n_estimators=100, random_state=42),
+}
 
 
 class MachineLearning:
@@ -40,6 +50,19 @@ class MachineLearning:
             return None
         return datos[["indice_mes"]].values, datos["cantidad"].values
 
+    def _entrenar_modelo(self, nombre, regressor, X, y):
+        pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("modelo", regressor),
+        ])
+        pipeline.fit(X, y)
+        pred = pipeline.predict(X)
+        return pipeline, {
+            "mae": round(float(mean_absolute_error(y, pred)), 2),
+            "rmse": round(float(np.sqrt(mean_squared_error(y, pred))), 2),
+            "r2": round(float(r2_score(y, pred)), 2),
+        }
+
     def entrenar(self, producto_id=None):
         productos = [self.inventario.obtener_producto(producto_id)] if producto_id else self.inventario.listar_productos()
         entrenados = 0
@@ -53,21 +76,30 @@ class MachineLearning:
                 continue
 
             X, y = datos
-            modelo = LinearRegression()
-            modelo.fit(X, y)
-            pred = modelo.predict(X)
+            comparacion = {}
+            mejor_nombre = None
+            mejor_pipeline = None
+            mejor_r2 = float("-inf")
 
-            self.modelos[producto.id] = modelo
-            joblib.dump(modelo, self.directorio / f"modelo_{producto.id}.joblib")
+            for nombre, regressor in MODELOS.items():
+                pipeline, metricas = self._entrenar_modelo(nombre, regressor, X, y)
+                comparacion[nombre] = metricas
+                if metricas["r2"] > mejor_r2:
+                    mejor_r2 = metricas["r2"]
+                    mejor_nombre = nombre
+                    mejor_pipeline = pipeline
+
+            self.modelos[producto.id] = mejor_pipeline
+            joblib.dump(mejor_pipeline, self.directorio / f"modelo_{producto.id}.joblib")
             self.metricas[str(producto.id)] = {
                 "producto": producto.nombre,
-                "mae": round(float(mean_absolute_error(y, pred)), 2),
-                "rmse": round(float(np.sqrt(mean_squared_error(y, pred))), 2),
-                "r2": round(float(r2_score(y, pred)), 2),
+                "modelo_elegido": mejor_nombre,
+                **comparacion[mejor_nombre],
+                "comparacion": comparacion,
                 "ultimo_mes": int(X.max()),
             }
             entrenados += 1
-            print(f"Modelo entrenado: {producto.nombre}")
+            print(f"Modelo entrenado: {producto.nombre} ({mejor_nombre}, R2={mejor_r2:.2f})")
 
         self._guardar_metricas()
         if entrenados == 0:
@@ -116,4 +148,8 @@ class MachineLearning:
             return
         print("\n--- Metricas de modelos ---")
         for datos in self.metricas.values():
-            print(f"{datos['producto']}: MAE={datos['mae']} RMSE={datos['rmse']} R2={datos['r2']}")
+            print(f"\n{datos['producto']} (mejor: {datos['modelo_elegido']})")
+            print(f"  MAE={datos['mae']} RMSE={datos['rmse']} R2={datos['r2']}")
+            print("  Comparacion por R2:")
+            for nombre, metricas in datos["comparacion"].items():
+                print(f"    {nombre}: R2={metricas['r2']}")

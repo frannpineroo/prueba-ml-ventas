@@ -1,6 +1,0 @@
-id,nombre,precio_compra,precio_venta,stock_actual,categoria
-1,Laptop Pro 15,800.0,1200.0,337,Electrónica
-2,Mouse Inalámbrico,15.0,35.0,1327,Electrónica
-3,Teclado Mecánico,45.0,89.0,592,Electrónica
-4,"Monitor 27""",200.0,350.0,188,Electrónica
-5,Silla Ergonómica,120.0,250.0,115,Muebles

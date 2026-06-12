@@ -9,7 +9,7 @@ def mostrar_productos(inventario):
         print("No hay productos.")
         return
     for p in productos:
-        print(f"  {p.id}. {p.nombre} | Compra ${p.precio_compra} | Venta ${p.precio_venta} | Stock {p.stock_actual}")
+        print(f"  {p}")
 
 
 def main():

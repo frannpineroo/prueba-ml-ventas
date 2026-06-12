@@ -14,6 +14,12 @@ class Producto:
     def margen(self) -> float:
         return self.precio_venta - self.precio_compra
 
+    def __str__(self):
+        return (
+            f"{self.id}. {self.nombre} | Compra ${self.precio_compra:.2f} | "
+            f"Venta ${self.precio_venta:.2f} | Stock {self.stock_actual}"
+        )
+
     def to_dict(self):
         return asdict(self)
 
